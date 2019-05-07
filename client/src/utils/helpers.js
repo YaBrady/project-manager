@@ -63,16 +63,47 @@ class Container {
   setHeader(tokenType = '', accessToken = '') {
     return this.container.setItem('Authorization', `${tokenType} ${accessToken}`);
   }
+  clearHeader() {
+    return this.container.removeItem('Authorization');
+  }
   getHeader() {
     return {
       Authorization: this.container.getItem('Authorization'),
     };
   }
+  hasHeader() {
+    return this.container.getItem('Authorization') != null;
+  }
+  hasUser() {
+    return this.container.getItem('User') != null;
+  }
+  clearUser() {
+    return this.container.removeItem('User');
+  }
+  setUser(user = {}) {
+    let userStr = '';
+    try {
+      userStr = JSON.stringify(user);
+    } catch ($e) {
+      userStr = '{}';
+    }
+    return this.container.setItem('User', userStr);
+  }
+  getUser() {
+    let user = null;
+    try {
+      user = JSON.parse(this.get('User'));
+    } catch ($e) {
+      user = {};
+    }
+    return { user };
+  }
 }
+const container = new Container();
 
 export {
   ajax,
   deepCopy,
   config,
-  Container,
+  container,
 };

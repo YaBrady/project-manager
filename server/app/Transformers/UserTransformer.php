@@ -13,6 +13,7 @@ class UserTransformer extends TransformerAbstract
             'user' => [
                 'email'      => $user->email,
                 'name'       => $user->name,
+                'avatar'       => $user->avatar,
                 'created_at' => $user->created_at ? $user->created_at->toDateString() : null,
             ]
         ];

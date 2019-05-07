@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Auth;
+use Exception;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Traits\HasRoles;
@@ -46,6 +47,34 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    /**
+     * 获取我所创建的团队
+     */
+    public function teams()
+    {
+        return $this->hasMany(Team::class);
+    }
+    /**
+     * 获取我所关联的团队
+     */
+    public function teamMate()
+    {
+        return $this->hasMany(TeamMates::class);
+    }
+
+    /**
+     * 查询是否有该团队
+     *
+     * @param $team_id
+     * @throws Exception
+     */
+    public function hasThisTeam($team_id)
+    {
+        if(!$this->teams()->find($team_id)) {
+            throw new Exception('您无权限');
+        }
     }
 
 

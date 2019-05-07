@@ -18,7 +18,7 @@ $api = app('Dingo\Api\Routing\Router');
 
 $api->version('v1', [
     'namespace'  => 'App\Http\Controllers',
-    'middleware' => ['serializer:array']
+    'middleware' => ['serializer:array', 'bindings']
 ], function ($api) {
     $api->group([
         'middleware' => 'api.throttle', // 调用频率限制的中间件
@@ -30,40 +30,71 @@ $api->version('v1', [
             return response('this is version v1');
         });
 
-//        //TODO:记得删除
-//        $api->get('test/user', function () {
-//            if (app()->environment() == 'local' || app()->environment() == 'testing') {
-//                $user  = \App\Models\User::find(1);
-//                $token = \Illuminate\Support\Facades\Auth::guard()->fromUser($user);
-//                // 添加 token
-//                $jwt_ttl     = Illuminate\Support\Facades\Auth::guard()->factory()->getTTL();
-//                $key         = 'singleToken:uId:' . $user->id;
-//                $singleToken = md5(get_client_ip() . $_SERVER['HTTP_USER_AGENT'] . $user->id);
-//                Illuminate\Support\Facades\Cache::put($key, $singleToken, $jwt_ttl);
-//                return response()->json(['access_token' => $token]);
-//            }
-//        });
-
-        // 登陆
+        // 登陆 √
         $api->post('login', 'Auth\LoginController@login');
-
-        // 注册
+        // 注册 √
         $api->post('register', 'Auth\LoginController@register');
 
         // 需要 token 验证的接口
         $api->group([
-            'namespace' => 'Api',
-            'middleware' => ['refresh.token']],
-            function ($api) {
-            // 当前登录用户信息
+            'namespace'  => 'Api',
+            'middleware' => ['refresh.token']
+        ], function ($api) {
+
+            // 当前登录用户信息 √
             $api->get('user', 'UserController@me');
+            // 注销 √
+            $api->post('logout', '\App\Http\Controllers\Auth\LoginController@logout');
+            // 更新用户信息 √
+            $api->post('user', 'UserController@update');
 
             /**
              * 团队
              */
 
-                // 获取团队
-                $api->get('team', 'TeamController@getTeam');
+            $api->resource('teams', 'TeamController');
+
+            /**
+             * 团队成员
+             */
+
+            // 邀请团队 --完成
+            $api->post('teams/{team}/team_mate', 'TeamController@inviteMate');
+
+            // 移除队员 --完成
+            $api->delete('teams/{team}/team_mate', 'TeamController@deleteMate');
+
+            /**
+             * 网页首页
+             */
+
+            $api->get('home', 'HomeController@home');
+
+
+            /**
+             * 邀请
+             */
+
+            // 接受/拒绝邀请 --完成
+            $api->put('invites/{invite}', 'InviteController@modify');
+            // 分页邀请列表 --完成
+            $api->get('invites', 'InviteController@all');
+
+
+            /**
+             * 项目
+             */
+
+            // 项目资源
+
+
+            /**
+             * 文件
+             */
+            // 上传文件 √
+            $api->post('file','FileController@upload');
+            // 删除文件
+            $api->delete('files/{file}','FileController@delete');
 
         });
     });

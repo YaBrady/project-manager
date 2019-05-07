@@ -51,7 +51,7 @@ class LoginController extends BaseController
         $name = $request->name;
         $user     = User::where('email', $email)->first();
         if ($user) {
-            return $this->response()->error('用户已存在');
+            return $this->response()->error('用户已存在',400);
         }
         $user = new User();
         $user->email = $email;
@@ -90,4 +90,14 @@ class LoginController extends BaseController
         ];
     }
 
+    /**
+     * 注销
+     *
+     * @return mixed
+     */
+    public function logout()
+    {
+        Auth::guard()->logout();
+        return $this->response()->array(['message'=>'ok']);
+    }
 }
