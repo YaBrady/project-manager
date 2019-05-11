@@ -33,6 +33,7 @@ class FileController extends BaseController
             list($realPath, $url) = $fileService->save($file);
             $dbFile->url  = $url;
             $dbFile->path = $realPath;
+            $dbFile->origin_name = $file->getClientOriginalName();
             $dbFile->save();
             DB::commit();
             return $this->response()->array(['file_id' => $dbFile->id]);

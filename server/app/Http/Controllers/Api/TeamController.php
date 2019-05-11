@@ -23,28 +23,30 @@ class TeamController extends BaseController
      */
     public function show(Team $team)
     {
-        $teamDetail = $team->load('teamMate');
-        $teamMate   = $teamDetail->teamMate;
+        $teamMate = $team->teamMate()->with('user')->get();
         if (!empty($teamMate)) {
             foreach ($teamMate as $item) {
-                $user            = User::find($item->user_id);
+                $user            = $item->user;
                 $item->user_name = $user->name;
                 $item->avatar    = $user->avatar;
+                unset($item->user);
             }
         }
-        return $this->response()->array($teamDetail);
+        return $this->response()->array($teamMate);
     }
 
     /**
      * 获取关联的团队
      *
      * @param TeamService $teamService
+     * @param Request $request
      * @return mixed
      */
-    public function index(TeamService $teamService)
+    public function index(TeamService $teamService, Request $request)
     {
         $user  = $this->user();
-        $teams = $teamService->getAllTeams($user);
+        $getMyTeam = $request->only_my_team ?? 0;
+        $teams = $teamService->getAllTeams($user, $getMyTeam);
         return $this->response()->array([
             'teams' => $teams
         ]);
@@ -68,12 +70,12 @@ class TeamController extends BaseController
         $teamMate             = new TeamMates();
         $teamMate->is_creator = 1;
         $teamMate->user_id    = $user->id;
-        $teamMate->team_name  = $request->team_name;
+        $teamMate->created_at  = $team->created_at;
         $team->teamMate()->save($teamMate);
         return $this->response()->array([
-            'team_id' => $team->id,
-            'created_at'=>$team->created_at->toDateString(),
-            'user_name'=>$user->name,
+            'team_id'    => $team->id,
+            'created_at' => $team->created_at->toDateString(),
+            'user_name'  => $user->name,
         ]);
     }
 
@@ -112,6 +114,7 @@ class TeamController extends BaseController
         try {
             $user = $this->user();
             $user->hasThisTeam($team->id);
+            $team->invites()->where('status', 0)->update(['status' => 3]);
             $team->teamMate()->delete();
             $team->delete();
             DB::commit();
@@ -188,4 +191,5 @@ class TeamController extends BaseController
         }
         return $this->response()->array(['message' => 'ok']);
     }
+
 }

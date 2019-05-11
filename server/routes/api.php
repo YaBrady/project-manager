@@ -64,12 +64,6 @@ $api->version('v1', [
             // 移除队员 --完成
             $api->delete('teams/{team}/team_mate', 'TeamController@deleteMate');
 
-            /**
-             * 网页首页
-             */
-
-            $api->get('home', 'HomeController@home');
-
 
             /**
              * 邀请
@@ -79,22 +73,49 @@ $api->version('v1', [
             $api->put('invites/{invite}', 'InviteController@modify');
             // 分页邀请列表 --完成
             $api->get('invites', 'InviteController@all');
+            // 获取弹窗邀请列表 --完成
+            $api->get('notifyInvites', 'InviteController@getNotifyInvites');
 
 
             /**
              * 项目
              */
 
-            // 项目资源
+            // 项目资源 --完成
+            $api->resource('projects', 'ProjectController');
 
+            // 邀请项目 --完成
+            $api->post('projects/{project}/project_mate', 'ProjectController@inviteMate');
 
+            // 移除项目成员 --完成
+            $api->delete('projects/{project}/project_mate', 'ProjectController@deleteMate');
+
+            // 项目关联团队 --完成
+            $api->put('projects/{project}/teams','ProjectController@relateTeam');
+
+            /**
+             * 项目条目
+             */
+
+            // 条目资源
+            $api->resource('projects/{project}/items', 'ProjectItemController');
+
+            // 步骤资源
+            $api->resource('projects/{project}/items/{item}/lists', 'ProjectItemListController');
+
+            // 新增评论
+            $api->post('projects/{project}/items/{item}/comment', 'ProjectItemController@storeComment');
+            // 删除评论
+            $api->delete('projects/{project}/comments/{comment}', 'ProjectItemController@deleteComment');
+            // 删除附件
+            $api->delete('projects/{project}/items/{item}/files','ProjectItemController@deleteFile');
             /**
              * 文件
              */
             // 上传文件 √
-            $api->post('file','FileController@upload');
+            $api->post('file', 'FileController@upload');
             // 删除文件
-            $api->delete('files/{file}','FileController@delete');
+            $api->delete('files/{file}', 'FileController@delete');
 
         });
     });

@@ -56,12 +56,24 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Team::class);
     }
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
     /**
      * 获取我所关联的团队
      */
     public function teamMate()
     {
         return $this->hasMany(TeamMates::class);
+    }
+    /**
+     * 获取我所关联项目
+     */
+    public function projectMate()
+    {
+        return $this->hasMany(ProjectMate::class);
     }
 
     /**
@@ -73,6 +85,26 @@ class User extends Authenticatable implements JWTSubject
     public function hasThisTeam($team_id)
     {
         if(!$this->teams()->find($team_id)) {
+            throw new Exception('您无权限');
+        }
+    }
+
+    /**
+     * 查询是否有该项目
+     *
+     * @param $project_id
+     * @throws Exception
+     */
+    public function hasThisProject($project_id)
+    {
+        if(!$this->projects()->where('id' ,$project_id)->exists()) {
+            throw new Exception('您无权限');
+        }
+    }
+
+    public function isJoinProject($project_id)
+    {
+        if(!$this->projectMate()->where('project_id' ,$project_id)->exists()) {
             throw new Exception('您无权限');
         }
     }
