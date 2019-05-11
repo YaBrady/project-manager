@@ -1,25 +1,27 @@
 <template>
-  <div class="teamListBox">
+    <div class="projectListBox">
     <ul class="itemUl">
-      <li v-for="(team,index) in teams" :key="index" @click="toTeamDetail(index)">
-        <div :class="team.is_creator?'itemBox':'itemBox participant'"  :title="team.team_name">
-          <p class="teamName" v-if="!is_add(index)">{{team.team_name}}</p>
-          <p class="teamTime" v-if="!is_add(index)">{{team.created_at}}</p>
-          <p class="addTeam"  v-if="is_add(index)">+</p>
+      <li v-for="(project,index) in projects" :key="index" @click="toProjectDetail(index)">
+        <div
+        :class="project.is_creator?'itemBox':'itemBox participant'"
+        :title="project.project_name">
+          <p class="projectName" v-if="!is_add(index)">{{project.project_name}}</p>
+          <p class="projectTime" v-if="!is_add(index)">{{project.created_at}}</p>
+          <p class="addProject"  v-if="is_add(index)">+</p>
         </div>
       </li>
     </ul>
-    <el-dialog  class="newTeamDialog" title="新增团队" :visible.sync="dialogFormVisible">
+    <el-dialog  class="newProjectDialog" title="新增项目" :visible.sync="dialogFormVisible">
       <el-form :model="form" ref="form" :rules="rules" status-icon >
-        <el-form-item class="newTeamItem" label="团队名称" prop="name" >
+        <el-form-item class="newProjectItem" label="项目名称" prop="name" >
           <el-input v-model="form.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item class="newTeamItem" label="备注" >
+        <el-form-item class="newProjectItem" label="备注" >
           <el-input v-model="form.desc"   type="textarea" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button type="primary" @click="createTeam">创 建</el-button>
+        <el-button type="primary" @click="createProject">创 建</el-button>
       </div>
     </el-dialog>
   </div>
@@ -32,21 +34,30 @@ import { mapActions } from 'vuex';
 export default {
   data() {
     return {
-      teams: [],
       dialogFormVisible: false,
+      projects: [],
       form: {
         name: '',
         desc: '',
       },
       rules: {
         name: [
-          { required: true, message: '请输入团队名称', trigger: 'blur' },
+          { required: true, message: '请输入项目名称', trigger: 'blur' },
         ],
       },
     };
   },
+  async mounted() {
+    const res = await ajax(`${config.appAddress}projects`, 'GET', container.getHeader());
+    this.projects = res.projects;
+    console.log(res);
+
+    this.projects.splice(this.projects.length, 0, {
+      is_add: true,
+    });
+  },
   methods: {
-    createTeam() {
+    async createProject() {
       this.$refs.form.validate(async (valid) => {
         if (!valid) {
           // 校验不通过
@@ -54,22 +65,22 @@ export default {
         }
         try {
           const data = {
-            team_name: this.form.name,
+            project_name: this.form.name,
             desc: this.form.desc,
           };
-          const res = await ajax(`${config.appAddress}teams`, 'POST', container.getHeader(), data);
-          data.team_id = res.team_id;
+          const res = await ajax(`${config.appAddress}projects`, 'POST', container.getHeader(), data);
+          data.project_id = res.project_id;
           data.user_name = res.user_name;
           data.is_creator = 1;
           data.created_at = res.created_at;
-          this.setTagActiveName('team_detail');
+          this.setTagActiveName('project_detail');
           this.$message({
             type: 'success',
             message: '创建成功',
           });
           this.$router.push(
             {
-              name: 'team-detail',
+              name: 'project-detail',
               params: data,
             },
           );
@@ -82,19 +93,19 @@ export default {
       });
     },
     is_add(index) {
-      return this.teams[index].is_add;
+      return this.projects[index].is_add;
     },
-    toTeamDetail(item) {
-      const team = this.teams[item];
-      if (team.is_add) {
+    async toProjectDetail(item) {
+      const project = this.projects[item];
+      if (project.is_add) {
         this.dialogFormVisible = true;
         return;
       }
-      this.setTagActiveName('team_detail');
+      this.setTagActiveName('project_detail');
       this.$router.push(
         {
-          name: 'team-detail',
-          params: team,
+          name: 'project-detail',
+          params: project,
         },
       );
     },
@@ -102,41 +113,34 @@ export default {
       setTagActiveName: 'setTagActiveName',
     }),
   },
-  async mounted() {
-    const res = await ajax(`${config.appAddress}teams`, 'GET', container.getHeader());
-    this.teams = res.teams;
-    this.teams.splice(this.teams.length, 0, {
-      is_add: true,
-    });
-  },
 };
 </script>
 
 <style>
-.newTeamDialog .el-form-item__error{
+.newProjectDialog .el-form-item__error{
   top: 20px;
   left: unset;
   right: 2px;
 }
-.teamListBox .el-dialog__header {
+.projectListBox .el-dialog__header {
   font-size: 14px;
   font-weight: 200;
   text-align: center;
 }
-.teamListBox .el-dialog{
+.projectListBox .el-dialog{
   width: 380px;
 }
-.newTeamItem textarea{
+.newProjectItem textarea{
   min-height: 80px !important;
 }
-.newTeamItem{
+.newProjectItem{
   font-weight: 700;
   color: #172b4d;
   font-size: 14px;
   line-height: 16px;
   margin-bottom:0;
 }
-.addTeam{
+.addProject{
   text-align: center;
   font-size: xx-large;
   padding: 25px 0;
@@ -168,7 +172,7 @@ export default {
 .participant {
   background: #607d8b;
 }
-.itemBox .teamName{
+.itemBox .projectName{
   text-align: center;
   padding: 15px;
   font-size: 1.4rem;
@@ -176,7 +180,7 @@ export default {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.itemBox .teamTime{
+.itemBox .projectTime{
   text-align: right;
   padding: 6px;
   font-size: 0.9rem;

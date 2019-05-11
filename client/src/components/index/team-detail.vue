@@ -25,7 +25,7 @@
     </el-aside>
     <el-container>
       <div class="teamSetting">
-        <el-card class="teamCard">
+        <el-card class="teamCard"  v-loading="isLoading" element-loading-text="加载中">
           <div class="teamCardHeader">
             <h2>团队成员</h2>
           </div>
@@ -36,13 +36,15 @@
                 <div  class="deleteImg" @click="removeMate(index)">
                   <el-image v-if="is_creator&&!mate.is_creator" :src="deleteImg"></el-image>
                 </div>
-                <el-image :src="mate.avatar ? mate.avatar : defaultImg"></el-image>
+                <el-image :src="mate.avatar ? mate.avatar : defaultImg">
+                   <el-image slot="error"    :src="defaultImg"></el-image>
+                </el-image>
                 <p>{{mate.user_name}}</p>
               </div>
             </li>
           </ul>
-          <el-divider content-position="center">邀请伙伴</el-divider>
-          <div class="inviteBox">
+          <el-divider content-position="center" v-if="!canShow">邀请伙伴</el-divider>
+          <div class="inviteBox" v-if="!canShow">
             <el-image :src="inviteImg"></el-image>
             <h2>邀请你的伙伴！</h2>
             <el-form :model="inviteForm" ref="inviteForm" :rules="inviteRules">
@@ -50,7 +52,7 @@
                 <el-input
                   style="width: 60%;margin-top: 10px;"
                   v-model="inviteForm.email"
-                  placeholder="如：gdkj@163.com">
+                  placeholder="邮箱地址 如：gdkj@163.com">
                 </el-input>
               </el-form-item>
               <el-form-item
@@ -66,18 +68,19 @@
           </div>
           <el-form style="padding:14px;" ref="form" v-model="form"  status-icon>
             <el-form-item label="团队名称" required >
-              <el-input v-model="form.team_name"  placeholder="如：项目突击队..."></el-input>
+              <el-input v-model="form.team_name" :disabled="canShow"  placeholder="如：项目突击队..."></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input
+              :disabled="canShow"
                 type="textarea"
                 v-model="form.desc"
                 placeholder="如：项目突击队主要用途是...">
               </el-input>
             </el-form-item>
             <el-form-item>
-              <el-button @click="commitForm" type="primary">更新</el-button>
-              <el-button @click="deleteTeam" type="danger">删除团队</el-button>
+              <el-button :disabled="canShow" @click="commitForm" type="primary">更新</el-button>
+              <el-button :disabled="canShow" @click="deleteTeam" type="danger">删除团队</el-button>
             </el-form-item>
           </el-form>
         </el-card>
@@ -104,6 +107,8 @@ export default {
       inviteImg: '',
       is_creator: false,
       team: {},
+      canShow: true,
+      isLoading: true,
       form: {
         team_name: '',
         desc: '',
@@ -133,10 +138,12 @@ export default {
     }
     this.form.team_name = this.team.team_name;
     this.is_creator = this.team.is_creator;
+    this.canShow = !this.is_creator;
     this.form.desc = this.team.desc;
     // 加载团队成员
     const res = await ajax(`${config.appAddress}teams/${this.team.team_id}`, 'GET', container.getHeader());
-    this.teamMate = res.team.team_mate;
+    this.teamMate = res.team_mates;
+    this.isLoading = false;
   },
   methods: {
     commitinviteForm() {

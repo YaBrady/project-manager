@@ -9,6 +9,9 @@ const store = new Vuex.Store({
     tagActiveName: 'team',
     tabActiveName: 'team',
     hasInvite: false,
+    nowItem: '',
+    itemId: 0,
+    selectItemCp: null,
   },
   // 直接获取的数据
   getters: {
@@ -31,6 +34,15 @@ const store = new Vuex.Store({
     setInvite(state, hasInvite) {
       state.hasInvite = hasInvite;
     },
+    setNowItem(state, nowItem) {
+      state.nowItem = nowItem;
+    },
+    setItemId(state, itemId) {
+      state.itemId = itemId;
+    },
+    setSelectItemCp(state, selectItemCp) {
+      state.selectItemCp = selectItemCp;
+    },
   },
   // 触发动作
   actions: {
@@ -48,6 +60,15 @@ const store = new Vuex.Store({
     },
     setInvite(context, hasInvite) {
       context.commit('setInvite', hasInvite);
+    },
+    setNowItem(context, nowItem) {
+      context.commit('setNowItem', nowItem);
+    },
+    setItemId(context, itemId) {
+      context.commit('setItemId', itemId);
+    },
+    setSelectItemCp(context, selectItemCp) {
+      context.commit('setSelectItemCp', selectItemCp);
     },
   },
 });

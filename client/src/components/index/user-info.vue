@@ -2,8 +2,10 @@
   <el-container style="margin:2% auto;">
     <el-aside width="400px" style="margin: 0 0 0 28%;">
       <el-card class="infoCard">
-        <div class="infoCardHeader"  @click="upload()" >
-          <el-image class="avatar" :src="user.avatar ? user.avatar : defaultImg"></el-image>
+        <div class="infoCardHeader"  @click="upload" >
+          <el-image class="avatar" :src="user.avatar ? user.avatar : defaultImg">
+            <el-image slot="error"  class="avatar"  :src="defaultImg"></el-image>
+          </el-image>
         </div>
           <p class="infoCardUserName">{{user.name}}</p>
           <el-divider></el-divider>

@@ -5,11 +5,11 @@
     <index-header></index-header>
   </el-header>
   <!-- 主体 -->
-  <el-main>
+  <el-main style="position: relative;min-height: 850px;">
     <router-view/>
   </el-main>
   <!-- 脚部 -->
-  <el-footer>footer</el-footer>
+  <!-- <el-footer>footer</el-footer> -->
 </el-container>
 </template>
 

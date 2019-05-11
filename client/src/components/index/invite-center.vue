@@ -70,14 +70,16 @@ export default {
     getInviteStatusName(status) {
       if (status) {
         if (status === 1) return '已接受';
-        return '已拒绝';
+        else if (status === 2) return '已拒绝';
+        return '团队已解散';
       }
       return '未处理';
     },
     getInviteStatusPoint(status) {
       if (status) {
         if (status === 1) return 'success';
-        return 'danger';
+        else if (status === 2) return 'danger';
+        return '';
       }
       return 'warning';
     },

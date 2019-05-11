@@ -21,6 +21,7 @@
     <li class="indexHeaderLiSplit"><el-link @click="toSetting">{{user.name}}</el-link></li>
     <li>
       <el-image  class="indexHeader-Image"  :src="user.avatar ? user.avatar : defaultImg">
+        <el-image slot="error"  class="indexHeader-Image"  :src="defaultImg"></el-image>
       </el-image>
     </li>
   </ul>
@@ -33,7 +34,7 @@ import defaultImg from '../../assets/avatar.png';
 import logo from '../../assets/logo.png';
 
 // Tabs索引
-const [home, team, project, setting, teamDetail, inviteCenter] = [
+const [home, team, project, setting, teamDetail, projectDetail, inviteCenter] = [
   {
     title: '首页',
     route: { name: 'home' },
@@ -55,6 +56,10 @@ const [home, team, project, setting, teamDetail, inviteCenter] = [
     route: { name: 'team-detail' },
   },
   {
+    title: '项目详情',
+    route: { name: 'project-detail' },
+  },
+  {
     title: '消息中心',
     route: { name: 'invite-center' },
   },
@@ -69,10 +74,12 @@ export default {
       breadcrumbModel: {
         team: [home, team],
         team_detail: [home, team, teamDetail],
+        project_detail: [home, project, projectDetail],
         project: [home, project],
         setting: [home, setting],
         inviteCenter: [home, inviteCenter],
       },
+      procId: null,
     };
   },
   computed: {
@@ -98,7 +105,36 @@ export default {
       this.setTagActiveName('setting');
       this.$router.push({ name: 'user-info' });
     },
+    async receiveNotify() {
+      let res = null;
+      try {
+        res = await ajax(`${config.appAddress}notifyInvites`, 'GET', container.getHeader());
+      } catch (e) {
+        console.log(e);
+        clearInterval(this.procId);
+      }
+      this.invites = res.invites;
+      if (this.invites.length) {
+        this.setInvite(true);
+        // 点击回调
+        this.invites.forEach((invite, index) => {
+          setTimeout(() => {
+            this.$notify({
+              title: '团队邀请',
+              message: `${invite.user_name}邀请你加入他的${invite.invitable_name}`,
+              position: 'bottom-left',
+              type: 'warning',
+              duration: 5000,
+              onClick: (this.notifyCallback)(index),
+            });
+          }, 300);
+        });
+      } else {
+        this.setInvite(false);
+      }
+    },
     async logout() {
+      clearInterval(this.procId);
       const res = await ajax(`${config.appAddress}logout`, 'POST', container.getHeader());
       if (res.message === 'ok') {
         container.clearHeader();
@@ -106,24 +142,11 @@ export default {
         this.$router.push({ name: 'login' });
       }
     },
-    ...mapActions({
-      removeUser: 'removeUser',
-      setTagActiveName: 'setTagActiveName',
-      setInvite: 'setInvite',
-    }),
-  },
-  async mounted() {
-    // 获取通知
-    const res = await ajax(`${config.appAddress}home`, 'GET', container.getHeader());
-    this.invites = res.invites;
-    if (this.invites.length) {
-      this.setInvite(true);
-    }
-    // 点击回调
-    const notifyCallback = function notifyCallback(index) {
+    notifyCallback(index) {
       return () => {
         const invite = this.invites[index];
         this.$confirm(`${invite.user_name}邀请你进入${invite.invitable_name}`, '提示', {
+          distinguishCancelAndClose: true,
           confirmButtonText: '加入',
           cancelButtonText: '拒绝',
           type: 'warning',
@@ -133,27 +156,26 @@ export default {
             type: 'success',
             message: '已接收邀请!',
           });
-        }).catch(async () => {
-          await ajax(`${config.appAddress}invites/${invite.id}`, 'PUT', container.getHeader(), { status: 2 });
-          this.$message({
-            type: 'success',
-            message: '已拒绝邀请!',
-          });
+        }).catch(async (action) => {
+          if (action === 'cancel') {
+            await ajax(`${config.appAddress}invites/${invite.id}`, 'PUT', container.getHeader(), { status: 2 });
+            this.$message({
+              type: 'success',
+              message: '已拒绝邀请!',
+            });
+          }
         });
       };
-    };
-    this.invites.forEach((invite, index) => {
-      setTimeout(() => {
-        this.$notify({
-          title: '团队邀请',
-          message: `${invite.user_name}邀请你加入他的${invite.invitable_name}`,
-          position: 'bottom-left',
-          type: 'warning',
-          duration: 5000,
-          onClick: (notifyCallback)(index),
-        });
-      }, 300);
-    });
+    },
+    ...mapActions({
+      removeUser: 'removeUser',
+      setTagActiveName: 'setTagActiveName',
+      setInvite: 'setInvite',
+    }),
+  },
+  async mounted() {
+    // 获取通知
+    // this.procId = setInterval(this.receiveNotify, 10000);
   },
 };
 </script>

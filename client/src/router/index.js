@@ -59,6 +59,11 @@ const router = new Router({
           component: () => import('@/components/index/team-detail'),
         },
         {
+          path: 'project-detail',
+          name: 'project-detail',
+          component: () => import('@/components/index/project-detail'),
+        },
+        {
           path: 'invite-center',
           name: 'invite-center',
           component: () => import('@/components/index/invite-center'),
