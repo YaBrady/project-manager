@@ -68,7 +68,10 @@
           </div>
           <el-form style="padding:14px;" ref="form" v-model="form"  status-icon>
             <el-form-item label="团队名称" required >
-              <el-input v-model="form.team_name" :disabled="canShow"  placeholder="如：项目突击队..."></el-input>
+              <el-input
+              v-model="form.team_name"
+              :disabled="canShow"
+              placeholder="如：项目突击队..."></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input

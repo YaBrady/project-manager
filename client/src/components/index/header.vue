@@ -110,10 +110,10 @@ export default {
       try {
         res = await ajax(`${config.appAddress}notifyInvites`, 'GET', container.getHeader());
       } catch (e) {
-        console.log(e);
         clearInterval(this.procId);
       }
       this.invites = res.invites;
+      this.setInvite(res.hasInvites);
       if (this.invites.length) {
         this.setInvite(true);
         // 点击回调
@@ -129,8 +129,6 @@ export default {
             });
           }, 300);
         });
-      } else {
-        this.setInvite(false);
       }
     },
     async logout() {
@@ -175,7 +173,7 @@ export default {
   },
   async mounted() {
     // 获取通知
-    // this.procId = setInterval(this.receiveNotify, 10000);
+    // this.procId = setInterval(this.receiveNotify, 3000);
   },
 };
 </script>

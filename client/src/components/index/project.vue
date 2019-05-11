@@ -50,8 +50,6 @@ export default {
   async mounted() {
     const res = await ajax(`${config.appAddress}projects`, 'GET', container.getHeader());
     this.projects = res.projects;
-    console.log(res);
-
     this.projects.splice(this.projects.length, 0, {
       is_add: true,
     });

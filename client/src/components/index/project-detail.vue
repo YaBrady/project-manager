@@ -1,7 +1,9 @@
 <template>
   <el-container  :class="showInvite ? 'showInvite showinviteBox': 'hiddenInvite showinviteBox'">
     <el-aside width="450px" style="position:relative;">
-      <div class="openImgBox" :class="showInvite ? 'rightOpenImgBox' : 'leftOpenImgBox'" @click="expendInviteBox">
+      <div class="openImgBox"
+      :class="showInvite ? 'rightOpenImgBox' : 'leftOpenImgBox'"
+      @click="expendInviteBox">
         <el-image :src="openImg"></el-image>
       </div>
       <el-card class="box-card"  v-loading="isLoading" element-loading-text="加载中">
@@ -10,7 +12,13 @@
          <el-image style="float: right; padding: 3px 0" type="text" :src="projectImg"></el-image>
         </div>
         <div class="box-body">
-          <el-select :disabled="canNotSelect" v-model="selectTeam" filterable @change="changeSelectTeam" multiple placeholder="请选择参与团队">
+          <el-select
+          :disabled="canNotSelect"
+          v-model="selectTeam"
+          filterable
+          @change="changeSelectTeam"
+          multiple
+          placeholder="请选择参与团队">
             <el-option
               v-for="item in myTeam"
               :key="item.value"
@@ -21,7 +29,10 @@
         </div>
         <div  class="box-header clearfix">
          <span>参与人员</span>
-         <el-image style="float: right; padding: 3px 0" type="text" :src="projectUserImg"></el-image>
+         <el-image
+         style="float: right; padding: 3px 0"
+         type="text"
+         :src="projectUserImg"></el-image>
         </div>
         <div class="box-body">
           <div class="teamSetting">
@@ -66,7 +77,10 @@
         <div class="box-body projectBox">
           <el-form style="padding:14px;" ref="form" v-model="form"  status-icon>
             <el-form-item label="项目名称" required >
-              <el-input :disabled="canNotSelect" v-model="form.project_name"  placeholder="如：番茄项目..."></el-input>
+              <el-input
+              :disabled="canNotSelect"
+              v-model="form.project_name"
+              placeholder="如：番茄项目..."></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input
@@ -78,7 +92,9 @@
             </el-form-item>
             <el-form-item>
               <el-button :disabled="canNotSelect" @click="commitForm" type="primary">更新</el-button>
-              <el-button :disabled="canNotSelect" @click="deleteProject" type="danger">删除项目</el-button>
+              <el-button :disabled="canNotSelect" @click="deleteProject" type="danger">
+                删除项目
+              </el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -97,7 +113,7 @@ import projectImg from '../../assets/project_team.png';
 import projectUserImg from '../../assets/project_user.png';
 import defaultImg from '../../assets/avatar.png';
 import inviteImg from '../../assets/invite.png';
-import team_leaderImg from '../../assets/team_leader.png';
+import teamLeaderImg from '../../assets/team_leader.png';
 import deleteImg from '../../assets/delete.png';
 import openImg from '../../assets/open.png';
 import settingImg from '../../assets/setting.png';
@@ -114,7 +130,6 @@ export default {
       canNotSelect: false,
       defaultImg: '',
       project: {},
-      inviteForm:{},
       inviteImg: '',
       deleteImg: '',
       team_leaderImg: '',
@@ -149,7 +164,7 @@ export default {
     this.defaultImg = defaultImg;
     this.inviteImg = inviteImg;
     this.deleteImg = deleteImg;
-    this.team_leaderImg = team_leaderImg;
+    this.teamLeaderImg = teamLeaderImg;
     this.openImg = openImg;
     this.settingImg = settingImg;
 
@@ -163,8 +178,6 @@ export default {
     this.form.desc = this.project.desc;
 
     const project = await ajax(`${config.appAddress}projects/${this.project.project_id}?`, 'GET', container.getHeader());
-    console.log(project);
-
     if (this.project.is_creator) {
       // 若是创建者
       const teamRes = await ajax(`${config.appAddress}teams?only_my_team=1`, 'GET', container.getHeader());
@@ -184,7 +197,7 @@ export default {
       this.showInvite = !this.showInvite;
     },
     async changeSelectTeam(selectTeam) {
-      await ajax(`${config.appAddress}projects/${this.project.project_id}/teams`, 'PUT', container.getHeader(), {teams: selectTeam});
+      await ajax(`${config.appAddress}projects/${this.project.project_id}/teams`, 'PUT', container.getHeader(), { teams: selectTeam });
     },
     removeMate(index) {
       const mate = this.invites_user[index];
@@ -252,8 +265,6 @@ export default {
           message: '更新成功',
         });
       } catch (e) {
-        console.log(e);
-
         this.$message.error({
           message: '更新失败',
         });

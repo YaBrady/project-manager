@@ -1,13 +1,30 @@
 <template>
   <el-card class="item-box-card">
-    <h2>{{listData.list ? listData.title : ''}} ({{listData.list ? listData.list.length-1 : 0}})</h2>
+    <h2>
+      {{listData.list ? listData.title : ''}} ({{listData.list ? listData.list.length-1 : 0}})
+      </h2>
     <div style="padding: 10px 0;"></div>
-    <el-card class="item-list-box-card" v-for="(item,index) in listData?  listData.list: []" :key="index" shadow="hover">
+    <el-card
+    class="item-list-box-card"
+    v-for="(item,index) in listData?  listData.list: []"
+    :key="index"
+    shadow="hover">
       <div @click="showItemDetail(index)" >
         <div class="item-title">
-          <div style="padding: 8px 15px 9px 15px;" class="newInputText inputText" v-if="(listData.uniqueKey+index != nowItem) && item.is_add" @click="showItemInput($event, index, item)">+</div>
-          <div style="padding: 8px 15px 9px 15px;"     v-if="(listData.uniqueKey+index != nowItem) && !item.is_add"> {{item.item_name}}</div>
-          <el-input class="itemListInput" @blur="updateItemName(item)" v-if="listData.uniqueKey+index == nowItem" v-model="item.item_name" placeholder="输入条目标题"></el-input>
+          <div
+          style="padding: 8px 15px 9px 15px;"
+          class="newInputText inputText"
+          v-if="(listData.uniqueKey+index != nowItem) && item.is_add"
+          @click="showItemInput($event, index, item)">+</div>
+          <div
+          style="padding: 8px 15px 9px 15px;"
+          v-if="(listData.uniqueKey+index != nowItem) && !item.is_add"> {{item.item_name}}</div>
+          <el-input
+          class="itemListInput"
+          @blur="updateItemName(item)"
+          v-if="listData.uniqueKey+index == nowItem"
+          v-model="item.item_name"
+          placeholder="输入条目标题"></el-input>
         </div>
         <div class="item-info" v-if="!item.is_add">
           <i class="el-icon-tickets" v-if="item.list_sum">
@@ -44,8 +61,19 @@
           <div class="dialogHeader">
             <el-image :src="editImg" >
             </el-image>
-               <div style="    width: 300px;padding: 12px 0 12px 16px;" class="dialog-title" @click="showItemInput($event, `${selectIndex}${selectItem.id}`, selectItem)"    v-if="`${this.listData.uniqueKey}${selectIndex}${selectItem.id}` != nowItem"> {{selectItem.item_name}}</div>
-               <el-input class="itemListInput" @blur="updateItemName(selectItem)" v-if="`${this.listData.uniqueKey}${selectIndex}${selectItem.id}` == nowItem" v-model="selectItem.item_name" placeholder="输入条目标题"></el-input>
+               <div
+               style="width: 300px;padding: 12px 0 12px 16px;"
+               class="dialog-title"
+               @click="showItemInput($event, `${selectIndex}${selectItem.id}`, selectItem)"
+               v-if="`${this.listData.uniqueKey}${selectIndex}${selectItem.id}` != nowItem">
+               {{selectItem.item_name}}
+               </div>
+               <el-input
+               class="itemListInput"
+                @blur="updateItemName(selectItem)"
+                v-if="`${this.listData.uniqueKey}${selectIndex}${selectItem.id}` == nowItem"
+                v-model="selectItem.item_name"
+                placeholder="输入条目标题"></el-input>
           </div>
 
           <div class="dialogHeader">
@@ -53,7 +81,12 @@
             </el-image>
             <div style="margin-left:14px;">
               <p class="dialogHeaderDesc">描述</p>
-              <el-input type="textarea"  @blur="updateItemDesc(selectItem)" style="width: 450px;"  v-model="selectItem.desc" placeholder="该条目的作用是..."></el-input>
+              <el-input
+              type="textarea"
+              @blur="updateItemDesc(selectItem)"
+              style="width: 450px;"
+              v-model="selectItem.desc"
+              placeholder="该条目的作用是..."></el-input>
             </div>
           </div>
           <div class="dialogHeader">
@@ -97,17 +130,33 @@
               <p class="dialogHeaderDesc">步骤条</p>
               <div>
                 <div style="width: 450px;">
-                  <el-progress :percentage="getProgress()" :status="getProgressStatus"></el-progress>
+                  <el-progress
+                  :percentage="getProgress()"
+                  :status="getProgressStatus"></el-progress>
                 </div>
-                <div v-for="(item,index) in steps">
+                <div v-for="(item, index) in steps" :key="index">
                   <div class="stopBox">
-                    <el-checkbox  @change="completeStep(item)"  style="    padding: 10px 0px 10px 0;" true-label=1 false-label=0 v-model="item.status"></el-checkbox>
-                    <el-input @blur="postItemContent(item)" autofocus style="width: 79%" v-model="item.list_content" placeholder="请输入步骤所需工作..."></el-input>
-                    <i class="el-icon-close itemClose" @click="deleteIteemContent(item, index)"></i>
+                    <el-checkbox
+                    :disabled="item.disable"
+                    @change="completeStep(item)"
+                    style="padding: 10px 0px 10px 0;"
+                    true-label="1"
+                    false-label="0"
+                    v-model="item.status"></el-checkbox>
+                    <el-input
+                    @blur="postItemContent(item)"
+                    autofocus style="width: 79%"
+                    v-model="item.list_content"
+                    placeholder="请输入步骤所需工作..."></el-input>
+                    <i class="el-icon-close itemClose" @click="deleteItemContent(item, index)"></i>
                   </div>
                 </div>
                 <div style="margin-top:10px;">
-                  <el-button type="info" style="margin-right: 30px;" @click="addStep">添加步骤</el-button>
+                  <el-button
+                  type="info"
+                  style="margin-right: 30px;"
+                  @click="addStep">
+                  添加步骤</el-button>
                     <i class="el-icon-tickets">
                       {{finishStep}}/{{steps.length}}
                     </i>
@@ -122,7 +171,7 @@
               <p class="dialogHeaderDesc">附件列表</p>
               <div style="width: 510px;">
                   <el-table
-                    :data="fileData"
+                    :data="selectItemCp.files"
                     style="width: 100%"
                     @selection-change="handleSelectionChange"
                     >
@@ -137,7 +186,7 @@
                       width="140">
                       <template slot-scope="scope">
                         <i class="el-icon-link"></i>
-                        <el-link type="primary" :href="scope.row.url">
+                        <el-link type="primary" :href="getLink(scope.row.id)">
                           {{ scope.row.origin_name }}
                         </el-link>
                       </template>
@@ -155,7 +204,11 @@
                     </el-table-column>
                   </el-table>
               </div>
-              <el-button type="danger" @click="deleteFiles" style="margin-top:16px;d">删除所选</el-button>
+              <el-button
+              type="danger"
+              @click="deleteFiles"
+              style="margin-top:16px;d">删除所选
+              </el-button>
             </div>
           </div>
           <div class="dialogHeader" >
@@ -165,7 +218,13 @@
             <p class="dialogHeaderDesc">发表评论</p>
             <el-form :model="commentform" ref="commentform" :rules="commentRule">
               <el-form-item  prop="comment_content">
-               <el-input type="textarea" class="commentBox" style="width: 450px;"  v-model="commentform.comment_content" placeholder="说点什么好呢..."></el-input>
+               <el-input
+                type="textarea"
+                class="commentBox"
+                style="width: 450px;"
+                v-model="commentform.comment_content"
+                placeholder="说点什么好呢...">
+               </el-input>
               </el-form-item>
               <div class="dialogCommentBox">
                 <el-image  class="commenAvatar" :src="user.avatar ? user.avatar : defaultImg">
@@ -184,12 +243,13 @@
             <div style="margin-left:14px;position:relative;">
             <p class="dialogHeaderDesc">评论列表</p>
               <div>
-                <div v-for="(comment,index) in comments" class="comment-outletbox">
+                <div v-for="(comment, index) in comments" :key="index" class="comment-outletbox">
                   <div class="comment-box">
                     <div>
                       <div style="width:32px">
                       <el-image :src="comment.avatar">
-                        <el-image slot="error"  class="indexHeader-Image"  :src="defaultImg"></el-image>
+                        <el-image slot="error"  class="indexHeader-Image"  :src="defaultImg">
+                        </el-image>
                       </el-image>
                       </div>
                       <p>{{comment.name}}</p>
@@ -214,10 +274,18 @@
           </div>
 
           <ul class="funList">
-            <li><el-button type="success" icon="el-icon-date" @click="attachDate">到期日</el-button></li>
-            <li><el-button type="success" icon="el-icon-tickets" @click="attachStep">步骤</el-button></li>
-            <li><el-button type="success" icon="el-icon-link" @click="depatch">附件</el-button></li>
-            <li><el-button type="danger" icon="el-icon-link" @click="deleteItem">删除条目</el-button></li>
+            <li>
+              <el-button type="success" icon="el-icon-date" @click="attachDate">到期日</el-button>
+            </li>
+            <li>
+              <el-button type="success" icon="el-icon-tickets" @click="attachStep">步骤</el-button>
+            </li>
+            <li>
+              <el-button type="success" icon="el-icon-link" @click="depatch">附件</el-button>
+            </li>
+            <li>
+              <el-button type="danger" icon="el-icon-link" @click="deleteItem">删除条目</el-button>
+            </li>
           </ul>
         </div>
       </div>
@@ -228,7 +296,7 @@
 
 <script>
 import { ajax, config, container } from '@/utils/helpers';
-import { mapState, mapActions} from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import editImg from '../../assets/edit.png';
 import descImg from '../../assets/desc.png';
 import talkImg from '../../assets/chat.png';
@@ -250,8 +318,8 @@ export default {
       },
       commentRule: {
         comment_content: [
-          { required: true, message: '评论内容不可为空', trigger: 'blur' }
-        ]
+          { required: true, message: '评论内容不可为空', trigger: 'blur' },
+        ],
       },
       selectItem: {
         item_name: '',
@@ -278,6 +346,7 @@ export default {
       fileData: [],
       deletesFiles: [],
       innerVisible: false,
+      comments: [],
     };
   },
   computed: {
@@ -289,12 +358,13 @@ export default {
     }),
     getProgressStatus() {
       const progress = this.getProgress();
-      if (progress<30) {
+      if (progress < 30) {
         return 'exception';
-      } else if(progress == 100) {
+      } else if (progress === 100) {
         return 'success';
       }
-    }
+      return '';
+    },
   },
   mounted() {
     this.fileInput = document.getElementById('uploadItemInput');
@@ -317,6 +387,12 @@ export default {
       setItemId: 'setItemId',
       setSelectItemCp: 'setSelectItemCp',
     }),
+    getItemStatus(item) {
+      return !item.id;
+    },
+    getLink(id) {
+      return `${config.appAddress}files/${id}`;
+    },
     async deleteTrueItem() {
       await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.itemId}`, 'DELETE', container.getHeader());
       this.$message({
@@ -324,7 +400,7 @@ export default {
         message: '删除成功!',
       });
       this.innerVisible = false;
-      this.listData.list.splice(this.selectIndex, 1)
+      this.listData.list.splice(this.selectIndex, 1);
       this.dialogFormVisible = false;
       this.selectIndex = -1;
       this.selectTime = null;
@@ -333,8 +409,6 @@ export default {
       this.deletesFiles = val;
     },
     async deleteItem() {
-      console.log(this.selectItem);
-
       if (this.selectItem) {
         this.innerVisible = true;
       }
@@ -342,42 +416,39 @@ export default {
     async deleteFiles() {
       if (this.deletesFiles.length) {
         const fileids = [];
-        console.log(this.deletesFiles);
-        console.log(this.selectItem);
-
-        for(const item of this.deletesFiles) {
-          console.log('1');
-
-        }
-        this.deletesFiles.forEach(element => {
+        this.deletesFiles.forEach((element) => {
           fileids.push(element.id);
-          this.selectItemCp.files.every((element2,index) =>{
-            if (element2.id === element.id) {
-              this.selectItem.files.splice(index, 1);
-              return false;
-            }
-          })
+          try {
+            this.selectItemCp.files.forEach((element2, index) => {
+              if (element2.id === element.id) {
+                this.selectItemCp.files.splice(index, 1);
+                throw new Error('跳出foreach');
+              }
+            });
+          } catch ($e) {
+            // empty
+          }
         });
-
         this.listData.list[this.selectIndex].file_sum -= fileids.length;
-        const res = await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.itemId}/files`, 'DELETE', container.getHeader(),  {fileids});
-
+        await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.itemId}/files`, 'DELETE', container.getHeader(), { fileids });
       }
       this.$message({
         type: 'success',
         message: '操作成功',
       });
     },
-    async postItemContent(item) {
+    async postItemContent(itemc) {
+      const item = itemc;
       const requestForm = {
         list_content: item.list_content,
         status: item.status,
       };
       if (!item.id) {
-        const res = await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.itemId}/lists`, 'POST', container.getHeader(),  requestForm);
+        const res = await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.itemId}/lists`, 'POST', container.getHeader(), requestForm);
         item.id = res.list_id;
+        item.disable = false;
       } else {
-        await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.itemId}/lists/${item.id}`, 'PUT', container.getHeader(),  requestForm);
+        await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.itemId}/lists/${item.id}`, 'PUT', container.getHeader(), requestForm);
       }
     },
     async deleteItemContent(item, index) {
@@ -386,30 +457,31 @@ export default {
       }
       await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.itemId}/lists/${item.id}`, 'DELETE', container.getHeader());
       if (item.status) {
-        this.finishStep --;
+        this.finishStep -= 1;
       }
       this.steps.splice(index, 1);
     },
     getProgress() {
-      if (this.steps.length == 0 ){
+      if (this.steps.length === 0) {
         return 0;
       }
-      return Math.round((this.finishStep / this.steps.length)*100);
+      return Math.round((this.finishStep / this.steps.length) * 100);
     },
     async completeStep(item) {
-      if(item.status === "1") {
-        this.finishStep ++;
-      } else if (item.status == "0"){
-        this.finishStep --;
+      if (item.status === '1') {
+        this.finishStep += 1;
+      } else if (item.status === '0') {
+        this.finishStep -= 1;
       }
       if (item.id) {
-        await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.itemId}/lists/${item.id}`, 'PUT', container.getHeader(), {status: item.status });
+        await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.itemId}/lists/${item.id}`, 'PUT', container.getHeader(), { status: item.status });
       }
     },
     addStep() {
       this.steps.push({
         status: 0,
-        list_: '',
+        list_content: '',
+        disable: true,
       });
     },
     depatch() {
@@ -418,32 +490,31 @@ export default {
     async selectTimeEvent() {
       const endtime = this.selectTime[1];
       const item = this.selectItem;
-      if (new Date(item.time)>endtime){
+      if (new Date(item.time) > endtime) {
         this.$message.error({
           message: '结束时间不能小于条目创建时间',
         });
         const itemTime = new Date(item.time);
-        this.selectTime=[];
+        this.selectTime = [];
         this.selectTime.push(itemTime);
         this.selectTime.push(itemTime);
       } else {
-        const end_time = (new Date(endtime)).toLocaleDateString().split('/');
-        await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.selectItem.id}`, 'PUT', container.getHeader(), { end_time:`${end_time[2]}-${end_time[0]}-${end_time[1]}` });
-        this.listData.list[this.selectIndex].end_time = `${end_time[2]}-${end_time[0]}-${end_time[1]}`;
-        this.selectItem.end_time = `${end_time[2]}-${end_time[0]}-${end_time[1]}`;
+        const endTime = (new Date(endtime)).toLocaleDateString().split('/');
+        await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.selectItem.id}`, 'PUT', container.getHeader(), { endTime: `${endTime[2]}-${endTime[0]}-${endTime[1]}` });
+        this.listData.list[this.selectIndex].endTime = `${endTime[2]}-${endTime[0]}-${endTime[1]}`;
+        this.selectItem.endTime = `${endTime[2]}-${endTime[0]}-${endTime[1]}`;
         this.$message({
           type: 'success',
           message: '添加到期日成功',
         });
       }
-
     },
     attachStep() {
       this.stepShow = !this.stepShow;
     },
     async attachDate() {
       const item = this.selectItem;
-      this.selectTime=[];
+      this.selectTime = [];
       if (this.dateShow && item.end_time) {
         this.dateShow = false;
         if (item.end_time !== '0000-00-00 00:00:00') {
@@ -458,7 +529,7 @@ export default {
         if (item.end_time !== '0000-00-00 00:00:00') {
           endtime = new Date(item.end_time);
         }
-        this.selectTime.push(endtime)
+        this.selectTime.push(endtime);
         this.dateShow = true;
       }
     },
@@ -469,12 +540,11 @@ export default {
         requestForm.append('file', file);
         let res = await ajax(`${config.appAddress}file`, 'POST', container.getHeader(), requestForm, true);
         requestForm = {
-          file_id: res.file_id
+          file_id: res.file_id,
         };
-        res = await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.itemId}`, 'PUT', container.getHeader(),  requestForm);
-        console.log(this.selectItemCp);
+        res = await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.itemId}`, 'PUT', container.getHeader(), requestForm);
         this.selectItemCp.files.unshift({
-          url: res.file.url,
+          id: res.file.id,
           origin_name: res.file.origin_name,
           created_at: res.file.created_at,
           name: res.file.name,
@@ -485,15 +555,13 @@ export default {
           message: '添加附件成功',
         });
       } catch (e) {
-        console.log(e);
-
         this.$message.error({
           message: '添加附件失败',
         });
       }
     },
     toComment() {
-        this.$refs.commentform.validate(async (valid) => {
+      this.$refs.commentform.validate(async (valid) => {
         if (!valid) {
           // 校验不通过
           return false;
@@ -502,24 +570,19 @@ export default {
           if (!this.commentform.comment_content) {
             return true;
           }
-          const res = await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.selectItem.id}/comment`, 'POST', container.getHeader(), { 'comment': this.commentform.comment_content });
+          const res = await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${this.selectItem.id}/comment`, 'POST', container.getHeader(), { comment: this.commentform.comment_content });
           this.$message({
             type: 'success',
             message: '评论成功',
           });
-          console.log(this.listData);
-          console.log(this.selectIndex);
-
-          this.listData.list[this.selectIndex].comment_sum++;
+          this.listData.list[this.selectIndex].comment_sum += 1;
           this.selectItem.comments.unshift({
             comment: this.commentform.comment_content,
             avatar: res.avatar,
             name: res.name,
             created_at: res.time,
-          })
+          });
         } catch (e) {
-          console.log(e);
-
           this.$message.error({
             message: '评论失败',
           });
@@ -528,20 +591,21 @@ export default {
       });
     },
     async changeStatus() {
-      const item = this.selectItem
-      await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${item.id}`, 'PUT', container.getHeader(), {status: item.status});
-      this.$emit('changeStatus',this.listData.status, this.selectIndex, item.status);
+      const item = this.selectItem;
+      await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${item.id}`, 'PUT', container.getHeader(), { status: item.status });
+      this.$emit('changeStatus', this.listData.status, this.selectIndex, item.status);
       this.dialogFormVisible = false;
     },
     async updateItemDesc(item) {
-      await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${item.id}`, 'PUT', container.getHeader(), {desc: item.desc});
+      await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${item.id}`, 'PUT', container.getHeader(), { desc: item.desc });
     },
-    async updateItemName(item) {
+    async updateItemName(itemc) {
+      const item = itemc;
       if (!item.item_name) {
-        return
+        return;
       }
       if (item.is_add) {
-        const res = await ajax(`${config.appAddress}projects/${this.listData.project_id}/items`, 'POST', container.getHeader(), {item_name: item.item_name, status: this.listData.status});
+        const res = await ajax(`${config.appAddress}projects/${this.listData.project_id}/items`, 'POST', container.getHeader(), { item_name: item.item_name, status: this.listData.status });
         item.id = res.item_id;
         item.list_sum = 0;
         item.list_finish = 0;
@@ -554,10 +618,11 @@ export default {
           item_name: '',
         });
       } else {
-        await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${item.id}`, 'PUT', container.getHeader(), {item_name: item.item_name});
+        await ajax(`${config.appAddress}projects/${this.listData.project_id}/items/${item.id}`, 'PUT', container.getHeader(), { item_name: item.item_name });
       }
     },
-    showItemInput(e,index, item) {
+    showItemInput(e, index, itemc) {
+      const item = itemc;
       if (item.is_add) {
         item.item_name = '';
       }
@@ -566,22 +631,20 @@ export default {
     },
     async showItemDetail(index) {
       const item = this.listData.list[index];
-      console.log(item);
-
       const itemTime = new Date(item.time);
-      this.selectTime=[];
+      this.selectTime = [];
       this.selectTime.push(itemTime);
-      let end_time = itemTime;
+      let endTime = itemTime;
 
       if (item.end_time) {
         if (item.end_time !== '0000-00-00 00:00:00') {
-          end_time = new Date(item.end_time.substr(0, 10));
+          endTime = new Date(item.end_time.substr(0, 10));
           this.dateShow = true;
         }
       } else {
         this.dateShow = false;
       }
-      this.selectTime.push(end_time);
+      this.selectTime.push(endTime);
 
       if (!item.is_add) {
         this.dialogFormVisible = true;
@@ -601,15 +664,14 @@ export default {
         }
         if (this.selectItem.files.length) {
           this.fileShow = true;
-          this.fileData = this.selectItem.files;
         } else {
           this.fileShow = true;
         }
         this.comments = this.selectItem.comments;
       }
     },
-  }
-}
+  },
+};
 </script>
 
 <style>

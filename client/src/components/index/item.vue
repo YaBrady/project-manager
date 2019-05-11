@@ -1,29 +1,41 @@
 <template>
   <ul class="proItemBox" v-loading="itemBoxLoading">
     <li>
-      <project-item-list v-on:changeStatus="changeStatus" :listData="listData[0]"></project-item-list>
+      <project-item-list
+      v-on:changeStatus="changeStatus"
+      :listData="listData[0]">
+      </project-item-list>
     </li>
     <li>
-      <project-item-list v-on:changeStatus="changeStatus" :listData="listData[1]"></project-item-list>
+      <project-item-list
+      v-on:changeStatus="changeStatus"
+      :listData="listData[1]">
+      </project-item-list>
     </li>
     <li>
-      <project-item-list v-on:changeStatus="changeStatus" :listData="listData[2]"></project-item-list>
+      <project-item-list
+      v-on:changeStatus="changeStatus"
+      :listData="listData[2]">
+      </project-item-list>
     </li>
     <li>
-      <project-item-list v-on:changeStatus="changeStatus"  :listData="listData[3]"></project-item-list>
+      <project-item-list
+      v-on:changeStatus="changeStatus"
+      :listData="listData[3]">
+      </project-item-list>
     </li>
   </ul>
 </template>
 
 <script>
 import { ajax, config, container } from '@/utils/helpers';
-import item_list from '@/components/index/item-list';
-import { mapState, mapActions} from 'vuex';
+import itemList from '@/components/index/item-list';
+import { mapState, mapActions } from 'vuex';
 
 export default {
   props: ['project_id'],
   components: {
-    'project-item-list': item_list,
+    'project-item-list': itemList,
   },
   data() {
     return {
@@ -31,7 +43,7 @@ export default {
       preList: [],
       doingList: [],
       endList: [],
-      listData: [{},{},{},{}],
+      listData: [{}, {}, {}, {}],
       itemBoxLoading: true,
     };
   },
@@ -91,51 +103,51 @@ export default {
         uniqueKey: 'end',
         title: '已完成',
       },
-    ]
+    ];
     this.itemBoxLoading = false;
   },
   computed: {
     ...mapState({
-      nowItem: state => state.nowItem
+      nowItem: state => state.nowItem,
     }),
   },
   mounted() {
     $(document).ready(() => {
-      $(document).on("click", (function(method) {
-      return (e) => {
-        if($(e.target).closest(".itemListInput").length == 0 ){
-          method();
-        }
-      };
-      })(this.cleanInputStatus));
-    })
+      $(document).on('click', (function allCLick(method) {
+        return (e) => {
+          if ($(e.target).closest('.itemListInput').length === 0) {
+            method();
+          }
+        };
+      }(this.cleanInputStatus)));
+    });
   },
   methods: {
     ...mapActions({
-      setNowItem: 'setNowItem'
+      setNowItem: 'setNowItem',
     }),
     cleanInputStatus() {
       this.setNowItem('');
     },
-    changeStatus(originStatus, index, toStatus) {
-      toStatus = Number(toStatus);
+    changeStatus(originStatus, index, toStatusc) {
+      const toStatus = Number(toStatusc);
       const origin = this.listData[originStatus].list;
       const item = origin[index];
       const to = this.listData[toStatus].list;
       let position = to.length;
-      this.listData[toStatus].list.every((element,index) => {
-        console.log(index,element.time,item.time);
+      this.listData[toStatus].list.every((element, index2) => {
         if (element.time && element.time <= item.time) {
-          position = index;
+          position = index2;
           return false;
         }
+        return true;
       });
-      if (position == to.length) {
-        position --;
+      if (position === to.length) {
+        position -= 1;
       }
       to.splice(position, 0, item);
       origin.splice(index, 1);
-    }
+    },
   },
 };
 </script>

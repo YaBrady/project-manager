@@ -11,7 +11,7 @@ const store = new Vuex.Store({
     hasInvite: false,
     nowItem: '',
     itemId: 0,
-    selectItemCp: null,
+    selectItemCp: {},
   },
   // 直接获取的数据
   getters: {

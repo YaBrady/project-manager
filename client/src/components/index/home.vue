@@ -37,7 +37,7 @@ export default {
       },
       set(tag) {
         this.triggerTags(tag);
-      }
+      },
     },
     ...mapState({
       tabActiveNameVux: state => state.tabActiveName,
